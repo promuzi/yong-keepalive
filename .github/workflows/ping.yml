@@ -1,0 +1,18 @@
+name: keep-server-awake
+
+# Render 무료 서버는 15분 유휴 시 잠든다 — 10분마다 헬스 엔드포인트를 두드려 깨워 둔다.
+# 월 사용량: 서버 쪽은 744h(무료 750h 안), Actions 쪽은 공개 저장소라 무제한 무료.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping yong-server
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 https://yong-server.onrender.com/)
+          echo "HTTP $code"
+          test "$code" = "200"
